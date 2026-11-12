@@ -17,8 +17,8 @@ class MyApp extends StatelessWidget {
         colorSchemeSeed: Colors.blue,
         useMaterial3: true,
       ),
-     // home: const HomePage(),
-     home: const CounterPage(),
+      home: const HomePage(),
+      //home: const CounterPage(),
     );
   }
 }
@@ -41,55 +41,170 @@ class JudulAplikasi extends StatelessWidget {
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
 
+//HomePage Awal
+  // @override
+  // Widget build(BuildContext context) {
+  //   return Scaffold(
+  //     appBar: AppBar(
+  //       title: const Text('Aplikasi Pertama'),
+  //     ),
+  //     body: LayoutBuilder(
+  //       builder: (context, constraints) {
+  //         final isTablet = constraints.maxWidth >= 600;
+
+  //         return Center(
+  //           child: ConstrainedBox(
+  //             constraints: const BoxConstraints(
+  //               maxWidth: 900,
+  //             ),
+  //             child: Padding(
+  //               padding: const EdgeInsets.all(24),
+  //               child: isTablet
+  //                   ? Row(
+  //                       mainAxisAlignment:
+  //                           MainAxisAlignment.center,
+  //                       children: [
+  //                         const Icon(
+  //                           Icons.tablet_mac,
+  //                           size: 100,
+  //                         ),
+  //                         const SizedBox(width: 30),
+  //                         const Expanded(
+  //                           child: WelcomeContent(),
+  //                         ),
+  //                       ],
+  //                     )
+  //                   : const Column(
+  //                       mainAxisAlignment:
+  //                           MainAxisAlignment.center,
+  //                       children: [
+  //                         Icon(
+  //                           Icons.phone_android,
+  //                           size: 100,
+  //                         ),
+  //                         SizedBox(height: 24),
+  //                         WelcomeContent(),
+  //                       ],
+  //                     ),
+  //             ),
+  //           ),
+  //         );
+  //       },
+  //     ),
+  //   );
+  // }
+
+//Membuat Layout dengan Container
+  // @override
+  // Widget build(BuildContext context){
+  //   return Scaffold(
+  //     appBar: AppBar(
+  //       title: const Text('Belajar Layout'),
+  //       centerTitle: true,
+  //     ),
+  //     body: Center(
+  //       child: Padding(
+  //         padding: const EdgeInsets.all(24),
+  //         child: Container(
+  //           width: 250,
+  //           height: 150,
+  //           decoration: BoxDecoration(
+  //             color: Colors.blue,
+  //             borderRadius: BorderRadius.circular(16),
+  //           ),
+  //           child:const Center(
+  //             child: Text(
+  //               'Halo Bayu',
+  //               style: TextStyle(
+  //                 color: Colors.white,
+  //                 fontSize: 24,
+  //                 fontWeight: FontWeight.bold,
+  //               ),
+  //             ),
+  //           ),
+  //         ),
+  //       ),
+  //     ),
+  //   );
+  //  }
+
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context){
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Aplikasi Pertama'),
+        title: const Text('Profile Card'),
+        centerTitle: true,
       ),
-      body: LayoutBuilder(
-        builder: (context, constraints) {
-          final isTablet = constraints.maxWidth >= 600;
+      // CARD PROFILE
+      // body: Center(
+      //   child: Padding(
+      //     padding: const EdgeInsets.all(20),
+      //     child: Container(
+      //     padding: const EdgeInsets.all(20),
+      //     decoration: BoxDecoration(
+      //       color: const Color.fromARGB(255, 66, 82, 93),
+      //       borderRadius: BorderRadius.circular(16),
+      //     ),
+      //     child: Row(
+      //       children: [
+      //         const CircleAvatar(
+      //           radius: 35,
+      //           child: Icon(Icons.person, size: 40),
+      //         ),
 
-          return Center(
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(
-                maxWidth: 900,
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(24),
-                child: isTablet
-                    ? Row(
-                        mainAxisAlignment:
-                            MainAxisAlignment.center,
-                        children: [
-                          const Icon(
-                            Icons.tablet_mac,
-                            size: 100,
-                          ),
-                          const SizedBox(width: 30),
-                          const Expanded(
-                            child: WelcomeContent(),
-                          ),
-                        ],
-                      )
-                    : const Column(
-                        mainAxisAlignment:
-                            MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.phone_android,
-                            size: 100,
-                          ),
-                          SizedBox(height: 24),
-                          WelcomeContent(),
-                        ],
-                      ),
-              ),
-            ),
-          );
-        },
+      //         const SizedBox(width: 16),
+
+      //         const Expanded(
+
+      //           child: Column(
+      //             crossAxisAlignment: CrossAxisAlignment.start,
+      //             mainAxisSize: MainAxisSize.min,
+      //             children: [
+      //               Text(
+      //                 'Bayu Ari Sandy',
+      //                 style: TextStyle(
+      //                   fontSize: 18,
+      //                   fontWeight: FontWeight.bold,
+      //                 ),
+      //               ),
+      //               SizedBox(height: 6),
+      //               Text('Teknik Informatika'),
+      //               Text('Flutter Developer'),
+      //             ],
+      //           ),
+      //         ),
+      //       ],
+      //     ),
+      //   ),
+      // ),
+      // ),
+
+      body: ListView(
+  padding: const EdgeInsets.all(16),
+  children: [
+    Card(
+      child: ListTile(
+        leading: const Icon(Icons.code),
+        title: const Text('Dart'),
+        subtitle: const Text('Bahasa pemrograman Flutter'),
       ),
+    ),
+    Card(
+      child: ListTile(
+        leading: const Icon(Icons.phone_android),
+        title: const Text('Flutter'),
+        subtitle: const Text('Framework pengembangan aplikasi'),
+      ),
+    ),
+    Card(
+      child: ListTile(
+        leading: const Icon(Icons.storage),
+        title: const Text('Database'),
+        subtitle: const Text('Penyimpanan data aplikasi'),
+      ),
+    ),
+  ],
+),
     );
   }
 }
@@ -140,6 +255,12 @@ class CounterPage extends StatefulWidget {
 class _CounterPageState extends State<CounterPage> {
   int angka = 0;
 
+  void resetAngka(){
+    setState((){
+      angka = 0;
+    });
+  }
+
   @override
   Widget build(BuildContext context){
     return Scaffold(
@@ -176,7 +297,13 @@ class _CounterPageState extends State<CounterPage> {
                   child: const Text('Kurang'),
                 )
               ]
-            )
+            ),
+            const SizedBox(height: 20),
+
+            ElevatedButton(
+              onPressed: resetAngka,
+              child: const Text('Reset'),
+            ),
           ],
         ),
       ),
