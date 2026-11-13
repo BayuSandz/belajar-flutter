@@ -38,8 +38,8 @@ class JudulAplikasi extends StatelessWidget {
   }
 }
 
-class HomePage extends StatelessWidget {
-  const HomePage({super.key});
+// class HomePage extends StatelessWidget {
+//   const HomePage({super.key});
 
 //HomePage Awal
   // @override
@@ -128,13 +128,14 @@ class HomePage extends StatelessWidget {
   //   );
   //  }
 
-  @override
-  Widget build(BuildContext context){
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Profile Card'),
-        centerTitle: true,
-      ),
+  // @override
+  // Widget build(BuildContext context){
+  //   return Scaffold(
+  //     appBar: AppBar(
+  //       title: const Text('Profile Card'),
+  //       centerTitle: true,
+  //     ),
+
       // CARD PROFILE
       // body: Center(
       //   child: Padding(
@@ -179,32 +180,98 @@ class HomePage extends StatelessWidget {
       // ),
       // ),
 
-      body: ListView(
-  padding: const EdgeInsets.all(16),
-  children: [
-    Card(
-      child: ListTile(
-        leading: const Icon(Icons.code),
-        title: const Text('Dart'),
-        subtitle: const Text('Bahasa pemrograman Flutter'),
+// LIST VIEW
+//       body: ListView(
+//   padding: const EdgeInsets.all(16),
+//   children: [
+//     Card(
+//       child: ListTile(
+//         leading: const Icon(Icons.code),
+//         title: const Text('Dart'),
+//         subtitle: const Text('Bahasa pemrograman Flutter'),
+//       ),
+//     ),
+//     Card(
+//       child: ListTile(
+//         leading: const Icon(Icons.phone_android),
+//         title: const Text('Flutter'),
+//         subtitle: const Text('Framework pengembangan aplikasi'),
+//       ),
+//     ),
+//     Card(
+//       child: ListTile(
+//         leading: const Icon(Icons.storage),
+//         title: const Text('Database'),
+//         subtitle: const Text('Penyimpanan data aplikasi'),
+//       ),
+//     ),
+//     Card(
+//       child: ListTile(
+//         leading: const Icon(Icons.water), 
+//         title: const Text('Java'),
+//         subtitle: const Text('Bahasa Pemrograman'),
+//       ),
+//     ),
+//     Card(
+//       child: ListTile(
+//         leading: const Icon(Icons.dashboard),
+//         title: const Text('UI/UX Design'),
+//         subtitle: const Text('Desain Aplikasi'),
+//       ),
+//     ),
+//   ],
+// ),
+ //   );
+ // }
+// }
+
+// Text Field
+class HomePage extends StatefulWidget {
+  const HomePage({super.key});
+
+@override 
+State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  final TextEditingController skillController = TextEditingController();
+
+  @override
+  void dispose(){
+    skillController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Belajar Textfield'),
       ),
-    ),
-    Card(
-      child: ListTile(
-        leading: const Icon(Icons.phone_android),
-        title: const Text('Flutter'),
-        subtitle: const Text('Framework pengembangan aplikasi'),
+      body: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          children: [
+            TextField(
+          controller: skillController,
+          decoration: const InputDecoration(
+            labelText: 'Nama Skill',
+            hintText: 'Masukkan nama skill',
+            border: OutlineInputBorder(),
+          ),
+        ),
+
+        const SizedBox(height: 15),
+
+        ElevatedButton(
+          onPressed: (){
+            print(skillController.text);
+          },
+          child: const Text('Tambah Skill'),
+        ),
+          ],
+        ),
       ),
-    ),
-    Card(
-      child: ListTile(
-        leading: const Icon(Icons.storage),
-        title: const Text('Database'),
-        subtitle: const Text('Penyimpanan data aplikasi'),
-      ),
-    ),
-  ],
-),
     );
   }
 }
