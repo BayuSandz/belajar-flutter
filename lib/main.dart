@@ -236,6 +236,20 @@ State<HomePage> createState() => _HomePageState();
 class _HomePageState extends State<HomePage> {
   final TextEditingController skillController = TextEditingController();
 
+  List<String> daftarSkill = [];
+
+  void tambahSkill(){
+    String skill = skillController.text.trim();
+
+    if (skill.isNotEmpty){
+      setState((){
+        daftarSkill.add(skill);
+      });
+
+      skillController.clear();
+    }
+  }
+
   @override
   void dispose(){
     skillController.dispose();
@@ -246,7 +260,8 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Belajar Textfield'),
+        title: const Text('Daftar Skill'),
+        centerTitle: true,
       ),
       body: Padding(
         padding: const EdgeInsets.all(20),
@@ -264,10 +279,24 @@ class _HomePageState extends State<HomePage> {
         const SizedBox(height: 15),
 
         ElevatedButton(
-          onPressed: (){
-            print(skillController.text);
-          },
+          onPressed: tambahSkill,
           child: const Text('Tambah Skill'),
+        ),
+
+        const SizedBox(height: 20),
+
+        Expanded(
+          child: ListView.builder(
+            itemCount: daftarSkill.length,
+            itemBuilder: (context, index){
+              return Card(
+                child: ListTile(
+                  leading: const Icon(Icons.code),
+                  title: Text(daftarSkill[index]),
+                ),
+              );
+            },
+          ),
         ),
           ],
         ),
