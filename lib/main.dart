@@ -1,8 +1,15 @@
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'providers/skill_provider.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(
+    ChangeNotifierProvider(
+      create: (context) => SkillProvider(),
+      child: const MyApp(),
+    )
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -236,18 +243,97 @@ State<HomePage> createState() => _HomePageState();
 class _HomePageState extends State<HomePage> {
   final TextEditingController skillController = TextEditingController();
 
-  List<String> daftarSkill = [];
 
   void tambahSkill(){
-    String skill = skillController.text.trim();
+    final skill = skillController.text.trim();
 
-    if (skill.isNotEmpty){
-      setState((){
-        daftarSkill.add(skill);
-      });
+    if (skill.isEmpty){
+      return;
+      }
 
+      context.read<SkillProvider>().tambahSkill(skill);
       skillController.clear();
+
     }
+
+  void hapusSkill(int index) {
+    context.read<SkillProvider>().hapusSkill(index);
+  }
+
+  void editSkill(int index){
+    String skillBaru = context.read<SkillProvider>().daftarSkill[index];
+
+    showDialog(
+      context: context,
+      builder: (dialogContext){
+        return AlertDialog(
+          title: const Text('Edit Skill'),
+          content: TextFormField(
+            initialValue: skillBaru,
+            decoration: const InputDecoration(
+              labelText: 'Nama Skill',
+              border: OutlineInputBorder(),
+            ),
+            onChanged: (value){
+              skillBaru = value;
+            },
+          ),
+
+          actions: [
+            TextButton(
+              onPressed: (){
+                Navigator.pop(dialogContext);
+              },
+              child: const Text('Batal'),
+            ),
+
+            ElevatedButton(
+              onPressed: (){
+
+                if (skillBaru.isEmpty){
+                  return;
+                }
+
+                context.read<SkillProvider>().editSkill(index, skillBaru.trim());
+
+                Navigator.pop(dialogContext);
+                },
+              child: const Text('Simpan'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void konfirmasiHapus(int index){
+    showDialog(
+      context: context,
+      builder: (dialogContext){
+        return AlertDialog(
+          title: const Text('Hapus Skill?'),
+          content: Text('Apakah kamu yakin ingin menghapus ${context.read<SkillProvider>().daftarSkill[index]}?',
+        ),
+
+        actions: [
+          TextButton(
+            onPressed: (){
+              Navigator.pop(dialogContext);
+            },
+            child: const Text('Batal'),
+          ),
+
+          ElevatedButton(
+            onPressed: (){
+              hapusSkill(index);
+              Navigator.pop(dialogContext);
+            },
+            child: const Text('Hapus'),
+          ),
+        ],
+        );
+      },
+    );
   }
 
   @override
@@ -287,12 +373,30 @@ class _HomePageState extends State<HomePage> {
 
         Expanded(
           child: ListView.builder(
-            itemCount: daftarSkill.length,
+            itemCount: context.watch<SkillProvider>().daftarSkill.length,
             itemBuilder: (context, index){
               return Card(
                 child: ListTile(
                   leading: const Icon(Icons.code),
-                  title: Text(daftarSkill[index]),
+                  title: Text(context.watch<SkillProvider>().daftarSkill[index]),
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.edit, color: Colors.blue),
+                        onPressed: (){
+                          editSkill(index);
+                        },
+                      ),
+
+                      IconButton(
+                        icon: const Icon(Icons.delete, color:Colors.red),
+                        onPressed: (){
+                          konfirmasiHapus(index);
+                        },
+                      ),
+                    ],
+                  ),
                 ),
               );
             },
