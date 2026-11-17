@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'providers/skill_provider.dart';
+import 'models/skill.dart';
 
 void main() {
   runApp(
@@ -241,70 +242,114 @@ State<HomePage> createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
+
+  String kategoriSkill = 'Programming';
+
+  final TextEditingController pencarianController = TextEditingController();
   final TextEditingController skillController = TextEditingController();
 
 
-  void tambahSkill(){
-    final skill = skillController.text.trim();
+  void tambahSkill() {
+  final namaSkill = skillController.text.trim();
 
-    if (skill.isEmpty){
-      return;
-      }
+  if (namaSkill.isEmpty) {
+    return;
+  }
 
-      context.read<SkillProvider>().tambahSkill(skill);
-      skillController.clear();
+  final skillBaru = Skill(
+    nama: namaSkill,
+    kategori: kategoriSkill,
+  );
 
-    }
+  context.read<SkillProvider>().tambahSkill(skillBaru);
+
+  skillController.clear();
+}
 
   void hapusSkill(int index) {
     context.read<SkillProvider>().hapusSkill(index);
   }
 
-  void editSkill(int index){
-    String skillBaru = context.read<SkillProvider>().daftarSkill[index];
+  void editSkill(int index) {
+  final skillLama =
+      context.read<SkillProvider>().daftarSkill[index];
 
-    showDialog(
-      context: context,
-      builder: (dialogContext){
-        return AlertDialog(
-          title: const Text('Edit Skill'),
-          content: TextFormField(
-            initialValue: skillBaru,
-            decoration: const InputDecoration(
-              labelText: 'Nama Skill',
-              border: OutlineInputBorder(),
-            ),
-            onChanged: (value){
-              skillBaru = value;
-            },
-          ),
+  String namaSkill = skillLama.nama;
+  String kategori = skillLama.kategori;
 
-          actions: [
-            TextButton(
-              onPressed: (){
-                Navigator.pop(dialogContext);
+  showDialog(
+    context: context,
+    builder: (dialogContext) {
+      return AlertDialog(
+        title: const Text('Edit Skill'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextFormField(
+              initialValue: namaSkill,
+              decoration: const InputDecoration(
+                labelText: 'Nama Skill',
+                border: OutlineInputBorder(),
+              ),
+              onChanged: (value) {
+                namaSkill = value;
               },
-              child: const Text('Batal'),
             ),
-
-            ElevatedButton(
-              onPressed: (){
-
-                if (skillBaru.isEmpty){
-                  return;
+            const SizedBox(height: 12),
+            DropdownButtonFormField<String>(
+              value: kategori,
+              decoration: const InputDecoration(
+                labelText: 'Kategori',
+                border: OutlineInputBorder(),
+              ),
+              items: context
+                  .read<SkillProvider>()
+                  .daftarKategori
+                  .map((item) {
+                return DropdownMenuItem(
+                  value: item,
+                  child: Text(item),
+                );
+              }).toList(),
+              onChanged: (value) {
+                if (value != null) {
+                  kategori = value;
                 }
-
-                context.read<SkillProvider>().editSkill(index, skillBaru.trim());
-
-                Navigator.pop(dialogContext);
-                },
-              child: const Text('Simpan'),
+              },
             ),
           ],
-        );
-      },
-    );
-  }
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(dialogContext);
+            },
+            child: const Text('Batal'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              if (namaSkill.trim().isEmpty) {
+                return;
+              }
+
+              final skillBaru = Skill(
+                nama: namaSkill.trim(),
+                kategori: kategori,
+              );
+
+              context
+                  .read<SkillProvider>()
+                  .editSkill(index, skillBaru);
+
+              Navigator.pop(dialogContext);
+            },
+            child: const Text('Simpan'),
+          ),
+        ],
+      );
+    },
+  );
+}
 
   void konfirmasiHapus(int index){
     showDialog(
@@ -312,7 +357,7 @@ class _HomePageState extends State<HomePage> {
       builder: (dialogContext){
         return AlertDialog(
           title: const Text('Hapus Skill?'),
-          content: Text('Apakah kamu yakin ingin menghapus ${context.read<SkillProvider>().daftarSkill[index]}?',
+          content: Text('Apakah kamu yakin ingin menghapus ${context.read<SkillProvider>().daftarSkill[index].nama}?',
         ),
 
         actions: [
@@ -339,6 +384,7 @@ class _HomePageState extends State<HomePage> {
   @override
   void dispose(){
     skillController.dispose();
+    pencarianController.dispose();
     super.dispose();
   }
 
@@ -362,7 +408,26 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
 
-        const SizedBox(height: 15),
+        const SizedBox(height: 12),
+
+        DropdownButtonFormField<String>(
+          value: kategoriSkill,
+          decoration: const InputDecoration(
+            labelText: 'Kategori Skill',
+            border: OutlineInputBorder(),
+          ),
+          items: context.read<SkillProvider>().daftarKategori.map((kategori){
+            return DropdownMenuItem<String>(
+              value: kategori,
+              child: Text(kategori),
+            );
+          }).toList(),
+          onChanged: (value){
+            setState((){
+              kategoriSkill = value!;
+            });
+          },
+        ),
 
         ElevatedButton(
           onPressed: tambahSkill,
@@ -372,10 +437,18 @@ class _HomePageState extends State<HomePage> {
         const SizedBox(height: 20),
 
         TextField(
-          decoration: const InputDecoration(
+          controller: pencarianController,
+          decoration: InputDecoration(
             hintText: 'Cari Skill...',
-            prefixIcon: Icon(Icons.search),
-            border: OutlineInputBorder(),
+            prefixIcon: const Icon(Icons.search),
+            suffixIcon: IconButton(
+              icon: const Icon(Icons.clear),
+              onPressed: (){
+                pencarianController.clear();
+                context.read<SkillProvider>().cariSkill('');
+              },
+            ),
+            border: const OutlineInputBorder(),
           ),
           onChanged: (value){
             context.read<SkillProvider>().cariSkill(value);
@@ -383,6 +456,57 @@ class _HomePageState extends State<HomePage> {
         ),
 
         const SizedBox(height: 15),
+
+        Consumer<SkillProvider>(
+          builder: (context, provider, child){
+            return Row(
+              children: [
+                Expanded(
+                  child: Card(
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Column(
+                        children: [
+                          const Text('Total Skill'),
+                          const SizedBox(height: 8,),
+                          Text(
+                            '${provider.totalSkill}',
+                            style: const TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: Card(
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Column(
+                        children: [
+                          const Text('Hasil Pencarian'),
+                          const SizedBox(height: 8),
+                          Text(
+                            '${provider.totalHasilPencarian}',
+                            style: const TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            );
+          },
+        ),
+
+        const SizedBox(height: 20),
 
         Expanded(
           child: ListView.builder(
@@ -395,7 +519,7 @@ class _HomePageState extends State<HomePage> {
               return Card(
                 child: ListTile(
                   leading: const Icon(Icons.code),
-                  title: Text(skill),
+                  title: Text(skill.nama),
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
