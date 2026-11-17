@@ -371,28 +371,45 @@ class _HomePageState extends State<HomePage> {
 
         const SizedBox(height: 20),
 
+        TextField(
+          decoration: const InputDecoration(
+            hintText: 'Cari Skill...',
+            prefixIcon: Icon(Icons.search),
+            border: OutlineInputBorder(),
+          ),
+          onChanged: (value){
+            context.read<SkillProvider>().cariSkill(value);
+          },
+        ),
+
+        const SizedBox(height: 15),
+
         Expanded(
           child: ListView.builder(
-            itemCount: context.watch<SkillProvider>().daftarSkill.length,
+            itemCount: context.watch<SkillProvider>().hasilPencarian.length,
             itemBuilder: (context, index){
+              final provider = context.watch<SkillProvider>();
+              final indeksAsli = provider.indeksHasilPencarian[index];
+              final skill = provider.daftarSkill[indeksAsli];
+
               return Card(
                 child: ListTile(
                   leading: const Icon(Icons.code),
-                  title: Text(context.watch<SkillProvider>().daftarSkill[index]),
+                  title: Text(skill),
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       IconButton(
                         icon: const Icon(Icons.edit, color: Colors.blue),
                         onPressed: (){
-                          editSkill(index);
+                          editSkill(indeksAsli);
                         },
                       ),
 
                       IconButton(
                         icon: const Icon(Icons.delete, color:Colors.red),
                         onPressed: (){
-                          konfirmasiHapus(index);
+                          konfirmasiHapus(indeksAsli);
                         },
                       ),
                     ],

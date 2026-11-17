@@ -3,7 +3,26 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SkillProvider extends ChangeNotifier {
+
   List<String> daftarSkill = [];
+  String kataPencarian = '';
+
+  List<String> get hasilPencarian{
+    return daftarSkill.where((skill){
+      return skill.toLowerCase().contains(kataPencarian.toLowerCase());
+    }).toList();
+  }
+
+  void cariSkill(String keyword){
+    kataPencarian = keyword;
+    notifyListeners();
+  }
+
+  List<int> get indeksHasilPencarian{
+    return daftarSkill.asMap().entries.where((entry){
+      return entry.value.toLowerCase().contains(kataPencarian.toLowerCase());
+    }).map((entry) => entry.key).toList();
+  }
 
   late final Future<void> _inisialisasi;
 
