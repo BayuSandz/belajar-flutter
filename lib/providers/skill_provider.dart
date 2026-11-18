@@ -10,6 +10,7 @@ class SkillProvider extends ChangeNotifier {
   List<Skill> daftarSkill = [];
 
   String kataPencarian = '';
+  String kategoriFilter = 'Semua';
   String kategoriTerpilih = 'Programming';
 
   List<String> daftarKategori = [
@@ -30,9 +31,10 @@ class SkillProvider extends ChangeNotifier {
 
   List<Skill> get hasilPencarian {
     return daftarSkill.where((skill) {
-      return skill.nama
-          .toLowerCase()
-          .contains(kataPencarian.toLowerCase());
+      final cocokNama = skill.nama.toLowerCase().contains(kataPencarian.toLowerCase());
+      final cocokKategori = kategoriFilter == 'Semua' || skill.kategori == kategoriFilter;
+
+      return cocokNama && cocokKategori;
     }).toList();
   }
 
@@ -41,11 +43,18 @@ class SkillProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  void filterKategori(String kategori){
+    kategoriFilter = kategori;
+    notifyListeners();
+  }
+
   List<int> get indeksHasilPencarian {
     return daftarSkill.asMap().entries.where((entry) {
-      return entry.value.nama
-          .toLowerCase()
-          .contains(kataPencarian.toLowerCase());
+      final skill = entry.value;
+      final cocokNama = skill.nama.toLowerCase().contains(kataPencarian.toLowerCase());
+      final cocokKategori = kategoriFilter == 'Semua' || skill.kategori == kategoriFilter;
+
+      return cocokNama && cocokKategori;
     }).map((entry) => entry.key).toList();
   }
 
