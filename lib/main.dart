@@ -247,6 +247,8 @@ class _HomePageState extends State<HomePage> {
 
   final TextEditingController pencarianController = TextEditingController();
   final TextEditingController skillController = TextEditingController();
+  final FocusNode fokusHalaman = FocusNode();
+  final FocusNode fokusNamaSkill = FocusNode();
 
 
   void tambahSkill() {
@@ -381,10 +383,52 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  void konfirmasiHapusSemua(){
+    showDialog(
+      context: context,
+      builder: (dialogContext){
+        return AlertDialog(
+          title: const Text('Hapus Semua Skill?'),
+          content: const Text(
+            'Apakah kamu yakin ingin menghapus seluruh skill?'
+            'Tindakan ini tidak dapat dibatalkan.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: (){
+                Navigator.pop(dialogContext);
+                WidgetsBinding.instance.addPostFrameCallback((_){
+                  fokusNamaSkill.unfocus();
+                });
+              },
+              child: const Text('Batal'),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red,
+                foregroundColor: Colors.white,
+              ),
+              onPressed: (){
+                context.read<SkillProvider>().hapusSemuaSkill();
+                Navigator.pop(dialogContext);
+                WidgetsBinding.instance.addPostFrameCallback((_){
+                  fokusNamaSkill.unfocus();
+                });
+              },
+              child: const Text('Hapus Semua'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   void dispose(){
     skillController.dispose();
     pencarianController.dispose();
+    fokusHalaman.dispose();
+    fokusNamaSkill.dispose();
     super.dispose();
   }
 
@@ -395,12 +439,13 @@ class _HomePageState extends State<HomePage> {
         title: const Text('Daftar Skill'),
         centerTitle: true,
       ),
-      body: Padding(
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
         child: Column(
           children: [
             TextField(
           controller: skillController,
+          focusNode: fokusNamaSkill,
           decoration: const InputDecoration(
             labelText: 'Nama Skill',
             hintText: 'Masukkan nama skill',
@@ -459,6 +504,66 @@ class _HomePageState extends State<HomePage> {
 
         Consumer<SkillProvider>(
           builder: (context, provider, child){
+            return DropdownButtonFormField<String>(
+              value: provider.kategoriFilter,
+              decoration: const InputDecoration(
+                labelText: 'Filter Kategori',
+                border: OutlineInputBorder(),
+              ),
+              items: [
+                const DropdownMenuItem(
+                  value: 'Semua',
+                  child: Text('Semua Kategori'),
+                ),
+                ...provider.daftarKategori.map((kategori){
+                  return DropdownMenuItem(
+                    value: kategori,
+                    child: Text(kategori),
+                  );
+                }),
+              ],
+              onChanged: (value){
+                if (value != null){
+                  provider.filterKategori(value);
+                }
+              },
+            );
+          },
+        ),
+
+        const SizedBox(height: 12),
+
+        Consumer<SkillProvider>(
+          builder: (context, provider, child) {
+            return DropdownButtonFormField<String>(
+              value: provider.urutanSkill,
+              decoration: const InputDecoration(
+                labelText: 'Urutkan Skill',
+                border: OutlineInputBorder(),
+              ),
+              items: const [
+                DropdownMenuItem(
+                  value: 'A-Z',
+                  child: Text('A - Z'),
+                ),
+                DropdownMenuItem(
+                  value: 'Z-A',
+                  child: Text('Z - A'),
+                ),
+              ],
+              onChanged: (value){
+                if (value != null){
+                  provider.ubahUrutanSkill(value);
+                }
+              },
+            );
+          },
+        ),
+
+        const SizedBox(height: 12,),
+
+        Consumer<SkillProvider>(
+          builder: (context, provider, child){
             return Row(
               children: [
                 Expanded(
@@ -508,12 +613,75 @@ class _HomePageState extends State<HomePage> {
 
         const SizedBox(height: 20),
 
-        Expanded(
-          child: ListView.builder(
-            itemCount: context.watch<SkillProvider>().hasilPencarian.length,
+        Consumer<SkillProvider>(
+          builder: (context, provider, child){
+            return Card(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text('Statistik Kategori', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold,
+                    ),
+                  ),
+
+                  const SizedBox(height: 12),
+
+                  ...provider.statistikKategori.entries.map((entry){
+                    final total = provider.totalSkill;
+                    final persentase = total == 0 ? 0.0 : entry.value/total;
+
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(entry.key),
+                              Text('${entry.value} skill'),
+                            ],
+                          ),
+                          const SizedBox(height: 8),
+                          LinearProgressIndicator(
+                            value: persentase,
+                            minHeight: 8,
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ],
+                      ),
+                    );
+                  }),
+                  ],
+                ),
+              ),
+            );
+          },
+        ),
+
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                onPressed: konfirmasiHapusSemua,
+                icon: const Icon(Icons.delete_forever),
+                label: const Text('Hapus Semua Skill'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.red,
+                  foregroundColor: Colors.white,
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 12),
+
+          ListView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: context.watch<SkillProvider>().indeksSkillTerurut.length,
             itemBuilder: (context, index){
               final provider = context.watch<SkillProvider>();
-              final indeksAsli = provider.indeksHasilPencarian[index];
+              final indeksAsli = provider.indeksSkillTerurut[index];
               final skill = provider.daftarSkill[indeksAsli];
 
               return Card(
@@ -542,7 +710,6 @@ class _HomePageState extends State<HomePage> {
               );
             },
           ),
-        ),
           ],
         ),
       ),

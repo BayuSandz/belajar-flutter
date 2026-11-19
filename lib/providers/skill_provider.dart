@@ -11,6 +11,7 @@ class SkillProvider extends ChangeNotifier {
 
   String kataPencarian = '';
   String kategoriFilter = 'Semua';
+  String urutanSkill = 'A-Z';
   String kategoriTerpilih = 'Programming';
 
   List<String> daftarKategori = [
@@ -48,6 +49,52 @@ class SkillProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  void ubahUrutanSkill(String urutan){
+    urutanSkill = urutan;
+    notifyListeners();
+  }
+
+  Map<String, int> get statistikKategori{
+    Map<String, int> hasil = {};
+
+    for(var kategori in daftarKategori){
+      hasil[kategori] = daftarSkill.where((skill) => skill.kategori == kategori).length;
+    }
+
+    return hasil;
+  }
+
+  List<Skill> get skillTerurut{
+    final hasil = hasilPencarian.toList();
+
+    hasil.sort((a, b){
+      if (urutanSkill == 'A-Z'){
+        return a.nama.compareTo(b.nama);
+      } else{
+        return b.nama.compareTo(a.nama);
+      }
+    });
+
+    return hasil;
+  }
+
+  List<int> get indeksSkillTerurut{
+    final indeks = indeksHasilPencarian;
+
+    indeks.sort((a, b){
+      final namaA = daftarSkill[a].nama;
+      final namaB = daftarSkill[b].nama;
+
+      if (urutanSkill == 'A-Z'){
+        return namaA.compareTo(namaB);
+      } else{
+        return namaB.compareTo(namaA);
+      }
+    });
+
+    return indeks;
+  }
+
   List<int> get indeksHasilPencarian {
     return daftarSkill.asMap().entries.where((entry) {
       final skill = entry.value;
@@ -62,6 +109,14 @@ class SkillProvider extends ChangeNotifier {
 
   SkillProvider() {
     _inisialisasi = muatSkill();
+  }
+
+  Future<void> hapusSemuaSkill() async{
+    await _inisialisasi;
+    daftarSkill.clear();
+    
+    await simpanSkill();
+    notifyListeners();
   }
 
   Future<void> muatSkill() async {
