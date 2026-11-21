@@ -251,7 +251,7 @@ class _HomePageState extends State<HomePage> {
   final FocusNode fokusNamaSkill = FocusNode();
 
 
-  void tambahSkill() {
+  Future <void> tambahSkill() async{
   final namaSkill = skillController.text.trim();
 
   if (namaSkill.isEmpty) {
@@ -263,7 +263,11 @@ class _HomePageState extends State<HomePage> {
     kategori: kategoriSkill,
   );
 
-  context.read<SkillProvider>().tambahSkill(skillBaru);
+  await context.read<SkillProvider>().tambahSkill(skillBaru);
+  final hasilExport = context.read<SkillProvider>().exportJson();
+
+  debugPrint('Hasil Export Json:');
+  debugPrint(hasilExport);
 
   skillController.clear();
 }

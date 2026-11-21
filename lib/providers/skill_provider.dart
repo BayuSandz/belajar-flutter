@@ -1,10 +1,10 @@
 
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 import '../models/skill.dart';
+import 'dart:io';
+import 'package:path_provider/path_provider.dart';
 
 class SkillProvider extends ChangeNotifier {
   List<Skill> daftarSkill = [];
@@ -13,6 +13,12 @@ class SkillProvider extends ChangeNotifier {
   String kategoriFilter = 'Semua';
   String urutanSkill = 'A-Z';
   String kategoriTerpilih = 'Programming';
+
+  String exportJson(){
+    final dataJson = daftarSkill.map((skill) => skill.toJson()).toList();
+
+    return jsonEncode(dataJson);
+  }
 
   List<String> daftarKategori = [
     'Programming',
@@ -111,12 +117,21 @@ class SkillProvider extends ChangeNotifier {
     _inisialisasi = muatSkill();
   }
 
+  Future<String> exportKeFile() async{
+    final jsonData = exportJson();
+    final direktori = await getApplicationDocumentsDirectory();
+    final file = File('${direktori.path}/backup_skill.json');
+    
+    await file.writeAsString(jsonData);
+    return file.path;
+  }
+
   Future<void> hapusSemuaSkill() async{
     await _inisialisasi;
     daftarSkill.clear();
     
     await simpanSkill();
-    notifyListeners();
+    notifyListeners(); 
   }
 
   Future<void> muatSkill() async {
