@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../models/skill.dart';
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
+import 'package:file_picker/file_picker.dart';
 
 class SkillProvider extends ChangeNotifier {
   List<Skill> daftarSkill = [];
@@ -117,6 +118,34 @@ class SkillProvider extends ChangeNotifier {
     _inisialisasi = muatSkill();
   }
 
+  Future<bool> importDariFile() async{
+    await _inisialisasi;
+
+    final hasilPilihFile = await FilePicker.pickFiles();
+
+    if(hasilPilihFile.isEmpty){
+      return false;
+    }
+
+    final fileTerpilih = hasilPilihFile.first;
+
+    if(fileTerpilih.path == null){
+      throw Exception('File tidak dapat dibaca');
+    }
+
+    final file = File(fileTerpilih.path!);
+    final isiFile = await file.readAsString();
+    final List<dynamic> dataJson = jsonDecode(isiFile);
+    final skillBaru = dataJson.map((item){
+      return Skill.fromJson(item);
+    }).toList();
+
+    daftarSkill = skillBaru;
+    await simpanSkill();
+    notifyListeners();
+    return true;
+  }
+
   Future<String> exportKeFile() async{
     final jsonData = exportJson();
     final direktori = await getApplicationDocumentsDirectory();
@@ -124,6 +153,18 @@ class SkillProvider extends ChangeNotifier {
     
     await file.writeAsString(jsonData);
     return file.path;
+  }
+
+  Future<Uri?> simpanBackupKePerangkat() async{
+    final jsonData = exportJson();
+
+    final lokasiFile = await FilePicker.saveFile(
+      dialogTitle: 'Simpan Backup Skill',
+      fileName: 'backup_skill.json',
+      bytes: utf8.encode(jsonData),
+    );
+
+    return lokasiFile;
   }
 
   Future<void> hapusSemuaSkill() async{

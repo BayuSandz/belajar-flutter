@@ -250,6 +250,63 @@ class _HomePageState extends State<HomePage> {
   final FocusNode fokusHalaman = FocusNode();
   final FocusNode fokusNamaSkill = FocusNode();
 
+  Future<void> importDataSkill() async{
+    try{
+      final berhasil = await context.read<SkillProvider>().importDariFile();
+
+      if(!mounted) return;
+      if(!berhasil){
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Import dibatalkan')),
+        );
+        return;
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Data skill berhasil diimport!'),
+        ),
+      );
+    } catch (e){
+      if(!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Gagal mengimport data: $e')),
+      );
+    }
+  }
+
+  Future<void> exportDataSkill() async{
+    try{
+      final lokasiFile = await context.read<SkillProvider>().simpanBackupKePerangkat();
+
+      if (!mounted) return;
+
+      if(lokasiFile == null){
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Export dibatalkan')),
+        );
+        return;
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Backup berhasil disimpan: $lokasiFile'),
+        ),
+      );
+
+      debugPrint('Lokasi file backup: $lokasiFile');
+    } catch (e){
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Gagal membuat backup: $e'),
+        ),
+      );
+    }
+  }
+
 
   Future <void> tambahSkill() async{
   final namaSkill = skillController.text.trim();
@@ -329,6 +386,9 @@ class _HomePageState extends State<HomePage> {
           TextButton(
             onPressed: () {
               Navigator.pop(dialogContext);
+              WidgetsBinding.instance.addPostFrameCallback((_){
+                  fokusNamaSkill.unfocus();
+                });
             },
             child: const Text('Batal'),
           ),
@@ -348,6 +408,9 @@ class _HomePageState extends State<HomePage> {
                   .editSkill(index, skillBaru);
 
               Navigator.pop(dialogContext);
+              WidgetsBinding.instance.addPostFrameCallback((_){
+                  fokusNamaSkill.unfocus();
+                });
             },
             child: const Text('Simpan'),
           ),
@@ -370,6 +433,9 @@ class _HomePageState extends State<HomePage> {
           TextButton(
             onPressed: (){
               Navigator.pop(dialogContext);
+              WidgetsBinding.instance.addPostFrameCallback((_){
+                  fokusNamaSkill.unfocus();
+                });
             },
             child: const Text('Batal'),
           ),
@@ -378,6 +444,9 @@ class _HomePageState extends State<HomePage> {
             onPressed: (){
               hapusSkill(index);
               Navigator.pop(dialogContext);
+              WidgetsBinding.instance.addPostFrameCallback((_){
+                  fokusNamaSkill.unfocus();
+                });
             },
             child: const Text('Hapus'),
           ),
@@ -662,6 +731,18 @@ class _HomePageState extends State<HomePage> {
               ),
             );
           },
+        ),
+
+        ElevatedButton.icon(
+          onPressed: exportDataSkill,
+          icon: const Icon(Icons.download),
+          label: const Text('Export JSON'),
+        ),
+
+        ElevatedButton.icon(
+          onPressed: importDataSkill,
+          icon: const Icon(Icons.upload_file),
+          label: const Text('Import JSON'),
         ),
 
             SizedBox(
