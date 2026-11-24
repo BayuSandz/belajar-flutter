@@ -4,11 +4,20 @@ import 'providers/skill_provider.dart';
 import 'pages/home_page.dart';
 import 'pages/addskill_page.dart';
 import 'pages/showskill_page.dart';
+import 'providers/theme_provider.dart';
+
 
 void main(){
   runApp(
+    MultiProvider(
+      providers: [
     ChangeNotifierProvider(
       create: (context) => SkillProvider(),
+    ),
+    ChangeNotifierProvider(
+      create: (context) => ThemeProvider(),
+    ),
+      ],
       child: const MyApp(),
     ),
   );
@@ -19,14 +28,28 @@ class MyApp extends StatelessWidget{
 
   @override
   Widget build(BuildContext context){
+    return Consumer<ThemeProvider>(
+      builder: (context, themeProvider, child){
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Skill Tracker',
+
       theme: ThemeData(
         colorSchemeSeed: Colors.blue,
+        brightness: Brightness.light,
         useMaterial3: true,
       ),
+      
+      darkTheme: ThemeData(
+        colorSchemeSeed: Colors.blue,
+        brightness: Brightness.dark,
+        useMaterial3: true,
+      ),
+
+      themeMode: themeProvider.themeMode,
       home: const MainPage(),
+    );
+  },
     );
   }
 }
@@ -40,6 +63,7 @@ class MainPage extends StatefulWidget{
 
 class _MainPageState extends State<MainPage> {
   int halamanTerpilih = 0;
+  bool isDarkMode = false;
 
   final List<Widget> halaman = const [
     HomePage(),
@@ -59,6 +83,25 @@ class _MainPageState extends State<MainPage> {
       appBar: AppBar(
         title: Text(judulHalaman[halamanTerpilih]),
         centerTitle: true,
+        actions: [
+          Consumer<ThemeProvider>(
+            builder: (context, themeProvider, child){
+          return IconButton(
+            onPressed: (){
+              themeProvider.ubahTema();
+            },
+            icon: Icon(
+              themeProvider.isDarkMode
+              ? Icons.light_mode
+              : Icons.dark_mode,
+            ),
+            tooltip: themeProvider.isDarkMode
+            ? 'Ganti ke Light Mode'
+            : 'Gamto le Dark Moder',
+          );
+            },
+          ),
+        ],
       ),
 
       body: IndexedStack(
