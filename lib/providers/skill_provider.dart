@@ -212,7 +212,7 @@ class SkillProvider extends ChangeNotifier {
     await prefs.setStringList('daftarSkillJson', data);
   }
 
-  Future<void> tambahSkill(Skill skill) async {
+  Future<void> addSkill(Skill skill) async {
     await _inisialisasi;
 
     daftarSkill.add(skill);
