@@ -5,6 +5,7 @@ import 'pages/home_page.dart';
 import 'pages/addskill_page.dart';
 import 'pages/showskill_page.dart';
 import 'providers/theme_provider.dart';
+import 'pages/settings_page.dart';
 
 
 void main(){
@@ -69,12 +70,14 @@ class _MainPageState extends State<MainPage> {
     HomePage(),
     AddSkillPage(),
     ShowSkillPage(),
+    SettingsPage(),
   ];
 
   final List<String> judulHalaman = [
     'Home',
     'Add Skill',
     'Show Skill',
+    'Settings',
   ];
 
   @override
@@ -131,6 +134,11 @@ class _MainPageState extends State<MainPage> {
             icon: Icon(Icons.list_alt_outlined),
             selectedIcon: Icon(Icons.list_alt),
             label: 'Daftar Skill',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.settings_outlined),
+            selectedIcon: Icon(Icons.settings),
+            label: 'Settings',
           ),
         ],
       ),
